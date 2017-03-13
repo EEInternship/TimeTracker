@@ -16,8 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HistoryActivity" />
-        <activity android:name=".FinishActivity"></activity>
+        <activity android:name=".MonthlyOverviewActivity" />
+        <activity android:name=".FinishActivity" />
+        <activity android:name=".FinishRemoteActivity"></activity>
     </application>
 
 </manifest>

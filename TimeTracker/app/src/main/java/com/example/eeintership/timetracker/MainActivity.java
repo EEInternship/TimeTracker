@@ -13,5 +13,6 @@ public class MainActivity extends AppCompatActivity {
     public void test(){
         System.out.println("Test");
         //Klemen was also here
+        //Klemen is lost
     }
 }

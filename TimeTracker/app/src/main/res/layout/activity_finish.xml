@@ -166,16 +166,22 @@
                         android:textColorHint="#000000" />
                 </LinearLayout>
 
-                <Button
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="70dp"
-                    android:background="@xml/btn_design_orange"
-                    android:fontFamily="sans-serif"
-                    android:text="Finish"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18dp" />
+                    android:layout_height="42dp"
+                    android:layout_marginTop="25dp"
+                    android:background="@xml/btn_design_orange_shadow">
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@xml/btn_design_orange"
+                        android:fontFamily="sans-serif"
+                        android:text="Finish"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18dp" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

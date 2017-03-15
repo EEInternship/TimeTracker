@@ -57,7 +57,6 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
     private String[] namesOfMonths;
     private int[] numberOfDaysInMonth;
 
-    private TextView textViewMonthlyOverview;
     ////
     ListView l;
     String[] cars = {"Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak"};
@@ -81,32 +80,13 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
         namesOfMonths=new String[]{"Januar","Februar","Marec","April"};
         numberOfDaysInMonth= new int[] {31,28,31,30};
         Log.i("MonthlyOverviewActivity",namesOfMonths[currentDate.get(Calendar.MONTH)+1]);
-        textViewMonthlyOverview=(TextView)findViewById(R.id.tvMonthlyOverview);
         mCredential=GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
         getResultsFromApi();
 
 
         ////
-        l = (ListView) findViewById(R.id.lista);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cars) {
-            @NonNull
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View v = super.getView(position, convertView, parent);
-               /* TextView tv=(TextView) v.findViewById(android.R.id.text1);
-                if(position%2==0){
-                    v.setBackgroundColor(Color.parseColor("#FFFFFF"));
-                    tv.setTextColor(Color.RED);
-                }else{
-                    v.setBackgroundColor(Color.parseColor("#C0C0C0"));
-                }
-                return v;*/
 
-                return v;
-            }
-        };
-        l.setAdapter(adapter);
 
 
     }
@@ -124,7 +104,6 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
             chooseAccount();
         } else if (!isDeviceOnline()) {
             //checks if device has internet connection
-            textViewMonthlyOverview.setText("No network connection available!");
         } else {
             //if everything is OK, execute the Read request for the sheet
             new MakeRequestRead(mCredential).execute();
@@ -291,7 +270,25 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
 //                textViewMonthlyOverview.setText("No results returned.");
             } else {
                 strings.add(0, "Data retrieved using the Google Sheets API:");
-                //    textViewMonthlyOverview.setText(TextUtils.join("\n", strings));
+                l = (ListView) findViewById(R.id.lista);
+                adapter = new ArrayAdapter<String>(getApplication(), android.R.layout.simple_list_item_1,strings) {
+                    @NonNull
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        View v = super.getView(position, convertView, parent);
+               /* TextView tv=(TextView) v.findViewById(android.R.id.text1);
+                if(position%2==0){
+                    v.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                    tv.setTextColor(Color.RED);
+                }else{
+                    v.setBackgroundColor(Color.parseColor("#C0C0C0"));
+                }
+                return v;*/
+
+                        return v;
+                    }
+                };
+                l.setAdapter(adapter);
             }
         }
 

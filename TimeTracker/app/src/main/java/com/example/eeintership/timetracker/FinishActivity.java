@@ -56,36 +56,34 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { SheetsScopes.SPREADSHEETS };
     private GoogleAccountCredential mCredential;
-    private Button btnFinish;
     private Random random;
 
-public class FinishActivity extends AppCompatActivity {
     private ApplicationTimeTracker applicationTimeTracker;
     private Button buttonFinish;
     private EditText editTextDescription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finish);
 
         applicationTimeTracker = (ApplicationTimeTracker) getApplication();
-        final DataAll dataAll= applicationTimeTracker.getDataAll();
+        final DataAll dataAll = applicationTimeTracker.getDataAll();
         final UploadRepository uploadRepository = dataAll.getUploadRepository();
         try {
             uploadRepository.setWorkingTime();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        final Intent intentMainActivity = new Intent(this,MainActivity.class);
         editTextDescription = (EditText) findViewById(R.id.editTextFinish);
-        buttonFinish = (Button)findViewById(R.id.buttonFinish);
-        buttonFinish.setOnClickListener(new View.OnClickListener(){
+        buttonFinish = (Button) findViewById(R.id.buttonFinish);
+        buttonFinish.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 uploadRepository.description = editTextDescription.getText().toString();
                 dataAll.addUploadRepository(uploadRepository);
                 applicationTimeTracker.setDataAll(dataAll);
-                startActivity(intentMainActivity);
+                writeResultsToApi();
             }
         });
 
@@ -95,23 +93,15 @@ public class FinishActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
 
         random = new Random();
-        mCredential=GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES))
+        mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
 
-        btnFinish=(Button)findViewById(R.id.btnFinish);
-        btnFinish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                writeResultsToApi();
-            }
-        });
     }
-    private void writeResultsToApi()
-    {
-        if(!isGooglePlayServicesAvailable()) {
+
+    private void writeResultsToApi() {
+        if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
-        }
-        else if(mCredential.getSelectedAccountName()==null){
+        } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (!isDeviceOnline()) {
             //mTextView.setText("No network connection available!");
@@ -121,42 +111,44 @@ public class FinishActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isGooglePlayServicesAvailable(){
+    private boolean isGooglePlayServicesAvailable() {
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
-    private void acquireGooglePlayServices(){
+
+    private void acquireGooglePlayServices() {
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
-        if(googleApiAvailability.isUserResolvableError(connectionStatusCode)){
+        if (googleApiAvailability.isUserResolvableError(connectionStatusCode)) {
             showGooglePlayServiceAvailabilityErrorDialog(connectionStatusCode);
         }
     }
-    void showGooglePlayServiceAvailabilityErrorDialog(int connectionStatusCode){
+
+    void showGooglePlayServiceAvailabilityErrorDialog(int connectionStatusCode) {
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog =googleApiAvailability.getErrorDialog(
+        Dialog dialog = googleApiAvailability.getErrorDialog(
                 FinishActivity.this,
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES
         );
         dialog.show();
     }
-    private void chooseAccount(){
-        if(EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)){
-            startActivityForResult(mCredential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
-        }
-        else
-        {
-            EasyPermissions.requestPermissions(this,"This app needs to access your Google account (via Contacts).",
+
+    private void chooseAccount() {
+        if (EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)) {
+            startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+        } else {
+            EasyPermissions.requestPermissions(this, "This app needs to access your Google account (via Contacts).",
                     REQUEST_PERMISSION_GET_ACCOUNTS,
                     android.Manifest.permission.GET_ACCOUNTS);
         }
     }
+
     private boolean isDeviceOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if(networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnected()) {
             return true;
         } else {
             return false;
@@ -166,18 +158,18 @@ public class FinishActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
+        switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
-                if(resultCode != RESULT_OK){
+                if (resultCode != RESULT_OK) {
                     //mTextView.setText("This app requires Google Play Services. Please install Google Play Servies and re-launch this app!");
                 } else {
                     writeResultsToApi();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
-                if(resultCode == RESULT_OK && data != null && data.getExtras() != null) {
+                if (resultCode == RESULT_OK && data != null && data.getExtras() != null) {
                     String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    if(accountName != null) {
+                    if (accountName != null) {
                         SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
@@ -188,26 +180,30 @@ public class FinishActivity extends AppCompatActivity {
                 }
                 break;
             case REQUEST_AUTHORIZATION:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     writeResultsToApi();
                 }
                 break;
         }
     }
+
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
 
     }
+
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
-    private class MakeRequestWrite extends AsyncTask<Void,Void,Void> {
+
+    private class MakeRequestWrite extends AsyncTask<Void, Void, Void> {
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
@@ -245,7 +241,7 @@ public class FinishActivity extends AppCompatActivity {
             List<Object> data1 = new ArrayList<>();
             //Generate random int number for testing purposes
             int randomNumber = random.nextInt(10 - 0 + 1);
-            data1.add("Rnd:"+randomNumber);
+            data1.add("Rnd:" + randomNumber);
             data1.add("prepisC");
             data1.add("prepisD");
             data1.add("prepisE");

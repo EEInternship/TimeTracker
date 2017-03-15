@@ -34,53 +34,85 @@
             android:background="#323232"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/button_open"
+            <LinearLayout
+                android:id="@+id/background_shadow_open"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@xml/btn_design_green"
-                android:text="Open"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="18dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="20dp"/>
-
-            <Button
-                android:id="@+id/button_remote"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
                 android:layout_marginTop="10dp"
-                android:background="@xml/btn_design_green"
-                android:text="Remote"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="18dp"
-                android:layout_marginBottom="10dp"/>
+                android:background="@xml/btn_design_green_shadow">
 
-            <Button
-                android:id="@+id/button_break"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="10dp"
-                android:background="@xml/btn_design_green"
-                android:text="Break"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="18dp"
-                android:layout_marginBottom="10dp"/>
+                <Button
+                    android:id="@+id/button_open"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="0dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@xml/btn_design_green"
+                    android:text="Open"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18dp" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/button_monthly_overview"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="10dp"
-                android:background="@xml/btn_design_green"
-                android:text="Monthly Overview"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="18dp"
-                android:layout_marginBottom="10dp"/>
+                android:layout_height="42dp"
+                android:layout_marginTop="15dp"
+                android:background="@xml/btn_design_green_shadow">
+
+                <Button
+                    android:id="@+id/button_remote"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="0dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@xml/btn_design_green"
+                    android:text="Remote"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/background_shadow_break"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="15dp"
+                android:background="@xml/btn_design_green_shadow">
+
+                <Button
+                    android:id="@+id/button_break"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="0dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@xml/btn_design_green"
+                    android:text="Break"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="15dp"
+                android:background="@xml/btn_design_green_shadow">
+
+                <Button
+                    android:id="@+id/button_monthly_overview"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="0dp"
+                    android:layout_marginTop="0dp"
+                    android:background="@xml/btn_design_green"
+                    android:text="Monthly Overview"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18dp" />
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

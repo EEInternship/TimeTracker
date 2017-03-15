@@ -10,7 +10,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import java.sql.Time;
+import java.util.Calendar;
+
+import Data.DataAll;
+import Data.UploadRepository;
+
 public class MainActivity extends AppCompatActivity {
+
+    private ApplicationTimeTracker applicationTimeTracker;
+
+    private Button btnRemote;
+
 
     private LinearLayout ly_open_close;
     private Button btn_open_close;
@@ -26,10 +37,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        applicationTimeTracker = (ApplicationTimeTracker) getApplication();
+        final DataAll dataAll= new DataAll();
+        final UploadRepository uploadRepository = new UploadRepository();
+
+        final Intent intentFinishActivity = new Intent(this,FinishActivity.class);
+
         // hide status bar
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
+
 
         ly_open_close = (LinearLayout) this.findViewById(R.id.background_shadow_open);
         btn_open_close = (Button) this.findViewById(R.id.button_open);
@@ -57,9 +75,24 @@ public class MainActivity extends AppCompatActivity {
                     }
                     ly_open_close.setBackground(myDs);
 
+                    //INPUT START TIME
+                    Calendar calender = Calendar.getInstance();
+                    int cDay = calender.get(Calendar.DAY_OF_MONTH);
+                    int cMonth = calender.get(Calendar.MONTH) + 1;
+                    int cYear = calender.get(Calendar.YEAR);
+                    int cHour = calender.get(Calendar.HOUR);
+                    int cHourOfDay = calender.get(Calendar.HOUR_OF_DAY);
+                    int cMinute = calender.get(Calendar.MINUTE);
+                    int cSecond = calender.get(Calendar.SECOND);
+
+                    Time time = new Time(cHour,cMinute,cSecond);
+                    uploadRepository.startingTime = time;
+                    uploadRepository.date = calender;
+
                     btn_open_close.setTextColor(Color.parseColor("#C0FFFFFF"));
                     open = 1;
                     btn_open_close.setText("Close");
+
                 } else {
                     // for button change
                     Drawable myD = null;
@@ -81,9 +114,24 @@ public class MainActivity extends AppCompatActivity {
                     }
                     ly_open_close.setBackground(myDs);
 
+                    //INPUT FINISH TIME
+                    Calendar calender = Calendar.getInstance();
+                    int cHour = calender.get(Calendar.HOUR);
+                    int cHourOfDay = calender.get(Calendar.HOUR_OF_DAY);
+                    int cMinute = calender.get(Calendar.MINUTE);
+                    int cSecond = calender.get(Calendar.SECOND);
+                    uploadRepository.finishTime = new Time(cHour,cMinute,cSecond);
+                    dataAll.addUploadRepository(uploadRepository);
+
+                    applicationTimeTracker.setDataAll(dataAll);
+                    startActivity(intentFinishActivity);
+
+
                     btn_open_close.setTextColor(Color.parseColor("#FFFFFF"));
                     open = 0;
                     btn_open_close.setText("Open");
+
+
                 }
             }
         });
@@ -151,6 +199,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(intentOpenMonthlyOverview);
+            }
+        });
+
+
+
+
+        final Intent intentRemote =  new Intent(this, FinishRemoteActivity.class);
+        btnRemote = (Button) findViewById(R.id.button_remote);
+        btnRemote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(intentRemote);
             }
         });
     }

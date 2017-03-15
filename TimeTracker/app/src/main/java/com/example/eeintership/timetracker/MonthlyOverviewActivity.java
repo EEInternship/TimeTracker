@@ -8,12 +8,17 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,7 +42,7 @@ import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class    MonthlyOverviewActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
+public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
     private GoogleAccountCredential mCredential;
 
     static final int REQUEST_ACCOUNT_PICKER = 1;
@@ -46,12 +51,18 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 4;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
+
     private static final String[] SCOPES = { SheetsScopes.SPREADSHEETS_READONLY };
     private Calendar currentDate;
     private String[] namesOfMonths;
     private int[] numberOfDaysInMonth;
 
     private TextView textViewMonthlyOverview;
+    ////
+    ListView l;
+    String[] cars = {"Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak"};
+    ArrayAdapter<String> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +74,9 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
         decorView.setSystemUiVisibility(uiOptions);
 
 
+        //textViewMonthlyOverview=(TextView)findViewById(R.id.tvMonthlyOverview);
+        mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
+
         currentDate= Calendar.getInstance();
         namesOfMonths=new String[]{"Januar","Februar","Marec","April"};
         numberOfDaysInMonth= new int[] {31,28,31,30};
@@ -71,6 +85,30 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
         mCredential=GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
         getResultsFromApi();
+
+
+        ////
+        l = (ListView) findViewById(R.id.lista);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cars) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+               /* TextView tv=(TextView) v.findViewById(android.R.id.text1);
+                if(position%2==0){
+                    v.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                    tv.setTextColor(Color.RED);
+                }else{
+                    v.setBackgroundColor(Color.parseColor("#C0C0C0"));
+                }
+                return v;*/
+
+                return v;
+            }
+        };
+        l.setAdapter(adapter);
+
+
     }
 
     //Function called to hanled API calls for Sheets v4
@@ -92,31 +130,35 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
             new MakeRequestRead(mCredential).execute();
         }
     }
+  
     //Function that checks if the Play Service is Available
     private boolean isGooglePlayServicesAvailable(){
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
+
     //Function that acquires the Play Services if they are not available
     private void acquireGooglePlayServices(){
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
-        if(googleApiAvailability.isUserResolvableError(connectionStatusCode)){
+        if (googleApiAvailability.isUserResolvableError(connectionStatusCode)) {
             showGooglePlayServiceAvailabilityErrorDialog(connectionStatusCode);
         }
     }
+  
     //Called when the acquireGooglePlayServices runs into problems
     void showGooglePlayServiceAvailabilityErrorDialog(int connectionStatusCode){
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog =googleApiAvailability.getErrorDialog(
+        Dialog dialog = googleApiAvailability.getErrorDialog(
                 MonthlyOverviewActivity.this,
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES
         );
         dialog.show();
     }
-    //Function that triggers the Account picker.
+
+  //Function that triggers the Account picker.
     private void chooseAccount(){
         if(EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)){
             startActivityForResult(mCredential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
@@ -129,10 +171,11 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
         }
     }
     //Function that checks if the device is connected to the internet.
+
     private boolean isDeviceOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if(networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnected()) {
             return true;
         } else {
             return false;
@@ -142,18 +185,18 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
+        switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
-                if(resultCode != RESULT_OK){
-                    textViewMonthlyOverview.setText("This app requires Google Play Services. Please install Google Play Servies and re-launch this app!");
+                if (resultCode != RESULT_OK) {
+                    // textViewMonthlyOverview.setText("This app requires Google Play Services. Please install Google Play Servies and re-launch this app!");
                 } else {
                     getResultsFromApi();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
-                if(resultCode == RESULT_OK && data != null && data.getExtras() != null) {
+                if (resultCode == RESULT_OK && data != null && data.getExtras() != null) {
                     String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    if(accountName != null) {
+                    if (accountName != null) {
                         SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
@@ -165,25 +208,29 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
                 }
                 break;
             case REQUEST_AUTHORIZATION:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     getResultsFromApi();
                 }
                 break;
         }
     }
+
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
 
     }
+
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+
     //Async function that makes the reading run in the background
     private class MakeRequestRead extends AsyncTask<Void,Void,ArrayList<String>> {
         private com.google.api.services.sheets.v4.Sheets mService = null;
@@ -193,21 +240,22 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
             HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
             mService = new com.google.api.services.sheets.v4.Sheets
-                    .Builder(httpTransport,jsonFactory,credential)
+                    .Builder(httpTransport, jsonFactory, credential)
                     .setApplicationName("")
                     .build();
         }
 
         @Override
         protected ArrayList<String> doInBackground(Void... params) {
-            try{
+            try {
                 return getDataFromSheet();
-            }catch(Exception e){
+            } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
                 return null;
             }
         }
+
         //Function that gets the data from the sheet
         private ArrayList<String>getDataFromSheet() throws IOException {
             //Test spreadsheet
@@ -222,15 +270,16 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
             if (values != null) {
                 results.add("Datum");
                 for (List row : values) {
-                    String temp="";
-                    for(int i=0;i<row.size();i++){
-                        temp+=row.get(i)+" ";
+                    String temp = "";
+                    for (int i = 0; i < row.size(); i++) {
+                        temp += row.get(i) + " ";
                     }
                     results.add(temp);
                 }
             }
             return results;
         }
+
         @Override
         protected void onPreExecute() {
             //
@@ -239,10 +288,10 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
         @Override
         protected void onPostExecute(ArrayList<String> strings) {
             if (strings == null || strings.size() == 0) {
-                textViewMonthlyOverview.setText("No results returned.");
+//                textViewMonthlyOverview.setText("No results returned.");
             } else {
                 strings.add(0, "Data retrieved using the Google Sheets API:");
-                textViewMonthlyOverview.setText(TextUtils.join("\n", strings));
+                //    textViewMonthlyOverview.setText(TextUtils.join("\n", strings));
             }
         }
 
@@ -258,11 +307,10 @@ public class    MonthlyOverviewActivity extends AppCompatActivity implements Eas
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             MonthlyOverviewActivity.REQUEST_AUTHORIZATION);
                 } else {
-                    textViewMonthlyOverview.setText("The following error occurred:\n"
-                            + mLastError.getMessage());
+                    //       textViewMonthlyOverview.setText("The following error occurred:\n"+ mLastError.getMessage());
                 }
             } else {
-                textViewMonthlyOverview.setText("Request cancelled.");
+                //textViewMonthlyOverview.setText("Request cancelled.");
             }
         }
     }

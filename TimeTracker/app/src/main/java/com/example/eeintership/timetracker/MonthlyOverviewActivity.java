@@ -11,6 +11,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -33,6 +37,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
@@ -46,11 +51,13 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 4;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = {SheetsScopes.SPREADSHEETS_READONLY};
+
+    private static final String[] SCOPES = { SheetsScopes.SPREADSHEETS_READONLY };
+    private Calendar currentDate;
+    private String[] namesOfMonths;
+    private int[] numberOfDaysInMonth;
 
     private TextView textViewMonthlyOverview;
-
-
     ////
     ListView l;
     String[] cars = {"Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak"};
@@ -66,8 +73,17 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
+
         //textViewMonthlyOverview=(TextView)findViewById(R.id.tvMonthlyOverview);
         mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
+
+        currentDate= Calendar.getInstance();
+        namesOfMonths=new String[]{"Januar","Februar","Marec","April"};
+        numberOfDaysInMonth= new int[] {31,28,31,30};
+        Log.i("MonthlyOverviewActivity",namesOfMonths[currentDate.get(Calendar.MONTH)+1]);
+        textViewMonthlyOverview=(TextView)findViewById(R.id.tvMonthlyOverview);
+        mCredential=GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff());
         getResultsFromApi();
 
 
@@ -95,33 +111,44 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
 
     }
 
-    private void getResultsFromApi() {
-        if (!isGooglePlayServicesAvailable()) {
+    //Function called to hanled API calls for Sheets v4
+    private void getResultsFromApi()
+    {
+        if(!isGooglePlayServicesAvailable()) {
+            //checks if Google Play Services are available,
+            //if they are not available, acquire them
             acquireGooglePlayServices();
-        } else if (mCredential.getSelectedAccountName() == null) {
+        } else if(mCredential.getSelectedAccountName()==null){
+            //checks the current selected account which will perform the action
+            //if no account is found it opens up the account picker
             chooseAccount();
         } else if (!isDeviceOnline()) {
-            // textViewMonthlyOverview.setText("No network connection available!");
+            //checks if device has internet connection
+            textViewMonthlyOverview.setText("No network connection available!");
         } else {
+            //if everything is OK, execute the Read request for the sheet
             new MakeRequestRead(mCredential).execute();
         }
     }
-
-    private boolean isGooglePlayServicesAvailable() {
+  
+    //Function that checks if the Play Service is Available
+    private boolean isGooglePlayServicesAvailable(){
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
-    private void acquireGooglePlayServices() {
+    //Function that acquires the Play Services if they are not available
+    private void acquireGooglePlayServices(){
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
         if (googleApiAvailability.isUserResolvableError(connectionStatusCode)) {
             showGooglePlayServiceAvailabilityErrorDialog(connectionStatusCode);
         }
     }
-
-    void showGooglePlayServiceAvailabilityErrorDialog(int connectionStatusCode) {
+  
+    //Called when the acquireGooglePlayServices runs into problems
+    void showGooglePlayServiceAvailabilityErrorDialog(int connectionStatusCode){
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = googleApiAvailability.getErrorDialog(
                 MonthlyOverviewActivity.this,
@@ -131,13 +158,19 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
         dialog.show();
     }
 
-    private void chooseAccount() {
-        if (EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)) {
-            startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-        } else {
-            EasyPermissions.requestPermissions(this, "This app needs to access your Google account (via Contacts).", REQUEST_PERMISSION_GET_ACCOUNTS, android.Manifest.permission.GET_ACCOUNTS);
+  //Function that triggers the Account picker.
+    private void chooseAccount(){
+        if(EasyPermissions.hasPermissions(this, android.Manifest.permission.GET_ACCOUNTS)){
+            startActivityForResult(mCredential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
+        }
+        else
+        {
+            EasyPermissions.requestPermissions(this,"This app needs to access your Google account (via Contacts).",
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    android.Manifest.permission.GET_ACCOUNTS);
         }
     }
+    //Function that checks if the device is connected to the internet.
 
     private boolean isDeviceOnline() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -169,6 +202,7 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
+                        Log.i("MonthlyOverviewActivity","Name of selected account: "+mCredential.getSelectedAccountName());
                         getResultsFromApi();
                     }
                 }
@@ -197,7 +231,8 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-    private class MakeRequestRead extends AsyncTask<Void, Void, ArrayList<String>> {
+    //Async function that makes the reading run in the background
+    private class MakeRequestRead extends AsyncTask<Void,Void,ArrayList<String>> {
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
@@ -221,9 +256,12 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
             }
         }
 
-        private ArrayList<String> getDataFromSheet() throws IOException {
-            String spreadsheetId = "1IeH8kq3znoWEA7-BG8iGBC3IQqUzfnxE_dsGliy1hyo";
-            String range = "Januar!A3:I33";
+        //Function that gets the data from the sheet
+        private ArrayList<String>getDataFromSheet() throws IOException {
+            //Test spreadsheet
+            String spreadsheetId="1IeH8kq3znoWEA7-BG8iGBC3IQqUzfnxE_dsGliy1hyo";
+            String range = namesOfMonths[currentDate.get(Calendar.MONTH)]+"!A3:I"+
+                    String.valueOf(numberOfDaysInMonth[currentDate.get(Calendar.MONTH)]+2);
             ArrayList<String> results = new ArrayList<String>();
             ValueRange response = this.mService.spreadsheets().values()
                     .get(spreadsheetId, range)
@@ -246,7 +284,7 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
         protected void onPreExecute() {
             //
         }
-
+        //Called when the data is downloaded from the sheet
         @Override
         protected void onPostExecute(ArrayList<String> strings) {
             if (strings == null || strings.size() == 0) {

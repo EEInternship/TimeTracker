@@ -156,6 +156,7 @@
                     </LinearLayout>
 
                     <EditText
+                        android:id="@+id/editTextFinish"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:lines="2"
@@ -173,8 +174,10 @@
                     android:background="@xml/btn_design_orange_shadow">
 
                     <Button
+                        android:id="@+id/buttonFinish"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
+                        android:id="@+id/btnFinish"
                         android:background="@xml/btn_design_orange"
                         android:fontFamily="sans-serif"
                         android:text="Finish"

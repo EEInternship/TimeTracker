@@ -35,7 +35,7 @@ import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
+public class    MonthlyOverviewActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
     private GoogleAccountCredential mCredential;
 
     static final int REQUEST_ACCOUNT_PICKER = 1;

@@ -1,5 +1,6 @@
 package com.example.eeintership.timetracker;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_break_back;
     int breakBack = 0;
 
+    private Button btn_monthly_overview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +88,15 @@ public class MainActivity extends AppCompatActivity {
                     breakBack = 0;
                     btn_break_back.setText("Break");
                 }
+            }
+        });
+
+        final Intent intentOpenMonthlyOverview = new Intent(this,MonthlyOverviewActivity.class);
+        btn_monthly_overview=(Button)findViewById(R.id.button_monthly_overview);
+        btn_monthly_overview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(intentOpenMonthlyOverview);
             }
         });
     }

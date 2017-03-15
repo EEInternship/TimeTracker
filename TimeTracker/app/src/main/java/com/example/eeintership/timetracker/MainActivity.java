@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
 
         ly_open_close = (LinearLayout) this.findViewById(R.id.background_shadow_open);
+        final Intent intentOpenFinishActivity = new Intent(this,FinishActivity.class);
         btn_open_close = (Button) this.findViewById(R.id.button_open);
         btn_open_close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     btn_open_close.setTextColor(Color.parseColor("#FFFFFF"));
                     open = 0;
                     btn_open_close.setText("Open");
+                    startActivity(intentOpenFinishActivity);
                 }
             }
         });

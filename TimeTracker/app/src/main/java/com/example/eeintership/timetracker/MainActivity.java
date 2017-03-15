@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         ly_open_close = (LinearLayout) this.findViewById(R.id.background_shadow_open);
+        final Intent intentOpenFinishActivity = new Intent(this,FinishActivity.class);
         btn_open_close = (Button) this.findViewById(R.id.button_open);
         btn_open_close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +91,19 @@ public class MainActivity extends AppCompatActivity {
                     uploadRepository.startingTime = time;
                     uploadRepository.date = calender;
 
+                    // orange edge shows above the button
+                    LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+
+                    DisplayMetrics displayMetrics=getApplication().getResources()
+                            .getDisplayMetrics();
+
+                    int x=Math.round(2*(displayMetrics.xdpi)/displayMetrics.DENSITY_DEFAULT);
+                    params.setMargins(0,x,0,0);
+                    btn_open_close.setLayoutParams(params);
+
                     btn_open_close.setTextColor(Color.parseColor("#C0FFFFFF"));
                     open = 1;
                     btn_open_close.setText("Close");
@@ -114,6 +129,19 @@ public class MainActivity extends AppCompatActivity {
                     }
                     ly_open_close.setBackground(myDs);
 
+
+                    // green edge shows above the button
+                    LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+
+                    DisplayMetrics displayMetrics=getApplication().getResources()
+                            .getDisplayMetrics();
+
+                    int x=Math.round(2*(displayMetrics.xdpi)/displayMetrics.DENSITY_DEFAULT);
+                    params.setMargins(0,0,0,x);
+                    btn_open_close.setLayoutParams(params);
                     //INPUT FINISH TIME
                     Calendar calender = Calendar.getInstance();
                     int cHour = calender.get(Calendar.HOUR);
@@ -124,14 +152,11 @@ public class MainActivity extends AppCompatActivity {
                     dataAll.addUploadRepository(uploadRepository);
 
                     applicationTimeTracker.setDataAll(dataAll);
-                    startActivity(intentFinishActivity);
-
+                    startActivity(intentFinishActivity);                   
 
                     btn_open_close.setTextColor(Color.parseColor("#FFFFFF"));
                     open = 0;
                     btn_open_close.setText("Open");
-
-
                 }
             }
         });
@@ -162,6 +187,19 @@ public class MainActivity extends AppCompatActivity {
                     }
                     ly_break_back.setBackground(myDs);
 
+                    // orange edge shows above the button
+                    LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+
+                    DisplayMetrics displayMetrics=getApplication().getResources()
+                            .getDisplayMetrics();
+
+                    int x=Math.round(2*(displayMetrics.xdpi)/displayMetrics.DENSITY_DEFAULT);
+                    params.setMargins(0,x,0,0);
+                    btn_break_back.setLayoutParams(params);
+
                     btn_break_back.setTextColor(Color.parseColor("#C0FFFFFF"));
                     breakBack = 1;
                     btn_break_back.setText("Back");
@@ -185,6 +223,19 @@ public class MainActivity extends AppCompatActivity {
                         // if something goes wrong.
                     }
                     ly_break_back.setBackground(myDs);
+
+                    // green edge shows above the button
+                    LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+
+                    DisplayMetrics displayMetrics=getApplication().getResources()
+                            .getDisplayMetrics();
+
+                    int x=Math.round(2*(displayMetrics.xdpi)/displayMetrics.DENSITY_DEFAULT);
+                    params.setMargins(0,0,0,x);
+                    btn_break_back.setLayoutParams(params);
 
                     btn_break_back.setTextColor(Color.parseColor("#FFFFFF"));
                     breakBack = 0;

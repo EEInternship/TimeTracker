@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -29,8 +30,10 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
@@ -45,6 +48,9 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String[] SCOPES = { SheetsScopes.SPREADSHEETS_READONLY };
+    private Date currentDate;
+    private String[] namesOfMonths;
+    private int[] numberOfDaysInMonth;
 
     private TextView textViewMonthlyOverview;
     @Override
@@ -57,6 +63,10 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
+        currentDate= new Date();
+        namesOfMonths=new String[]{"Januar","Februar","Marec","April"};
+        numberOfDaysInMonth= new int[] {31,28,31,30};
+        Log.i("MonthlyOverviewActivity",namesOfMonths[currentDate.getMonth()]);
         textViewMonthlyOverview=(TextView)findViewById(R.id.tvMonthlyOverview);
         mCredential=GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
         getResultsFromApi();
@@ -183,8 +193,9 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
             }
         }
         private ArrayList<String>getDataFromSheet() throws IOException {
+            //Test spreadsheet
             String spreadsheetId="1IeH8kq3znoWEA7-BG8iGBC3IQqUzfnxE_dsGliy1hyo";
-            String range = "Januar!A3:I33";
+            String range = namesOfMonths[currentDate.getMonth()]+"!A3:I"+String.valueOf(numberOfDaysInMonth[currentDate.getMonth()]+2);
             ArrayList<String> results = new ArrayList<String>();
             ValueRange response = this.mService.spreadsheets().values()
                     .get(spreadsheetId, range)

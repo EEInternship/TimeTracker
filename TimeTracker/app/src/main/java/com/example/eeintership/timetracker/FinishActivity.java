@@ -61,7 +61,8 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
         decorView.setSystemUiVisibility(uiOptions);
 
         random = new Random();
-        mCredential=GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
+        mCredential=GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff());
 
         btnFinish=(Button)findViewById(R.id.btnFinish);
         btnFinish.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +114,9 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
         }
         else
         {
-            EasyPermissions.requestPermissions(this,"This app needs to access your Google account (via Contacts).",REQUEST_PERMISSION_GET_ACCOUNTS, android.Manifest.permission.GET_ACCOUNTS);
+            EasyPermissions.requestPermissions(this,"This app needs to access your Google account (via Contacts).",
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    android.Manifest.permission.GET_ACCOUNTS);
         }
     }
     private boolean isDeviceOnline() {

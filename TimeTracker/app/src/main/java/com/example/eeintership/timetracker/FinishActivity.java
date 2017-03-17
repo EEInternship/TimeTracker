@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,11 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.sql.Time;
 import java.text.ParseException;
 
-import Data.DataAll;
-import Data.UploadRepository;
+import Data.UserData;
+import Data.UploadSpreadsheetData;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -43,8 +41,6 @@ import java.util.List;
 import java.util.Random;
 
 import pub.devrel.easypermissions.EasyPermissions;
-
-import static android.R.attr.max;
 
 public class FinishActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
 
@@ -68,10 +64,10 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
         setContentView(R.layout.activity_finish);
 
         applicationTimeTracker = (ApplicationTimeTracker) getApplication();
-        final DataAll dataAll = applicationTimeTracker.getDataAll();
-        final UploadRepository uploadRepository = dataAll.getUploadRepository();
+        final UserData userData = applicationTimeTracker.getUserData();
+        final UploadSpreadsheetData uploadSpreadsheetData = userData.getUploadSpreadsheetData();
         try {
-            uploadRepository.setWorkingTime();
+            uploadSpreadsheetData.setWorkingTime();
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -80,9 +76,9 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
         buttonFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadRepository.description = editTextDescription.getText().toString();
-                dataAll.addUploadRepository(uploadRepository);
-                applicationTimeTracker.setDataAll(dataAll);
+                uploadSpreadsheetData.description = editTextDescription.getText().toString();
+                userData.addUploadRepository(uploadSpreadsheetData);
+                applicationTimeTracker.setUserData(userData);
                 writeResultsToApi();
             }
         });

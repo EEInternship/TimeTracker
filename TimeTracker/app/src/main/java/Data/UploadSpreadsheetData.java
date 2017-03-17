@@ -10,16 +10,15 @@ import java.util.Calendar;
  * Created by Klemen on 13. 03. 2017.
  */
 
-public class UploadRepository {
+public class UploadSpreadsheetData {
     public Time startingTime;
     public Time finishTime;
     public Time workingTime;
     public Time overHoursTime;
-    public Time remoteTime;
     public String description;
     public Calendar date;
 
-    public UploadRepository(){
+    public UploadSpreadsheetData(){
     }
 
     public void setWorkingTime() throws ParseException {

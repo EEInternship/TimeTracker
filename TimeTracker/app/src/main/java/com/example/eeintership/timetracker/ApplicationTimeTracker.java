@@ -1,29 +1,29 @@
 package com.example.eeintership.timetracker;
 
 import android.app.Application;
-import Data.DataAll;
+import Data.UserData;
 /**
  * Created by Klemen on 15. 03. 2017.
  */
 
 public class ApplicationTimeTracker extends Application{
-    private DataAll dataAll;
+    private UserData userData;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (dataAll == null){
-            dataAll = new DataAll();
+        if (userData == null){
+            userData = new UserData();
         }
     }
 
 
 
-    public DataAll getDataAll(){
-        return dataAll;
+    public UserData getUserData(){
+        return userData;
     }
 
-    public void setDataAll(DataAll data) {
-        this.dataAll = data;
+    public void setUserData(UserData data) {
+        this.userData = data;
     }
 }

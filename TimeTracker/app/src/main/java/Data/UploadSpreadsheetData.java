@@ -27,10 +27,10 @@ public class UploadSpreadsheetData {
         java.util.Date date2 = format.parse(finishTime.toString());
         long difference = date2.getTime() - date1.getTime();
         Time editedTime = new Time(difference);
-        workingTime = new Time(editedTime.getHours()-1,editedTime.getMinutes(),editedTime.getSeconds());
-
+        workingTime = new Time(editedTime.getHours()-1,editedTime.getMinutes(),0);
+        overHoursTime = new Time(0,0,0);
         if(workingTime.getHours()>8){
-            overHoursTime = new Time(workingTime.getHours()-8,workingTime.getMinutes(),workingTime.getSeconds());
+            overHoursTime = new Time(workingTime.getHours()-8,workingTime.getMinutes(),0);
             workingTime = new Time(8,0,0);
         }
 

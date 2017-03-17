@@ -12,7 +12,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import Data.UserData;
 import Data.UploadSpreadsheetData;
@@ -37,6 +41,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+
+
+
 
         applicationTimeTracker = (ApplicationTimeTracker) getApplication();
         final UserData userData = new UserData();
@@ -87,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                     int cMinute = calender.get(Calendar.MINUTE);
                     int cSecond = calender.get(Calendar.SECOND);
 
-                    Time time = new Time(cHour,cMinute,cSecond);
+                    Time time = new Time(cHourOfDay,cMinute,00);
                     uploadSpreadsheetData.startingTime = time;
                     uploadSpreadsheetData.date = calender;
 
@@ -148,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                     int cHourOfDay = calender.get(Calendar.HOUR_OF_DAY);
                     int cMinute = calender.get(Calendar.MINUTE);
                     int cSecond = calender.get(Calendar.SECOND);
-                    uploadSpreadsheetData.finishTime = new Time(cHour,cMinute,cSecond);
+                    uploadSpreadsheetData.finishTime = new Time(cHourOfDay,cMinute,00);
                     userData.addUploadRepository(uploadSpreadsheetData);
 
                     applicationTimeTracker.setUserData(userData);

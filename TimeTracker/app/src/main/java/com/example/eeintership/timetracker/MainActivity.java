@@ -12,10 +12,14 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
-import Data.DataAll;
-import Data.UploadRepository;
+import Data.UserData;
+import Data.UploadSpreadsheetData;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,9 +42,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+
+
+
+
         applicationTimeTracker = (ApplicationTimeTracker) getApplication();
-        final DataAll dataAll= new DataAll();
-        final UploadRepository uploadRepository = new UploadRepository();
+        final UserData userData = new UserData();
+        final UploadSpreadsheetData uploadSpreadsheetData = new UploadSpreadsheetData();
 
         final Intent intentFinishActivity = new Intent(this,FinishActivity.class);
 
@@ -87,9 +97,9 @@ public class MainActivity extends AppCompatActivity {
                     int cMinute = calender.get(Calendar.MINUTE);
                     int cSecond = calender.get(Calendar.SECOND);
 
-                    Time time = new Time(cHour,cMinute,cSecond);
-                    uploadRepository.startingTime = time;
-                    uploadRepository.date = calender;
+                    Time time = new Time(cHourOfDay,cMinute,00);
+                    uploadSpreadsheetData.startingTime = time;
+                    uploadSpreadsheetData.date = calender;
 
                     // orange edge shows above the button
                     LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
@@ -148,10 +158,10 @@ public class MainActivity extends AppCompatActivity {
                     int cHourOfDay = calender.get(Calendar.HOUR_OF_DAY);
                     int cMinute = calender.get(Calendar.MINUTE);
                     int cSecond = calender.get(Calendar.SECOND);
-                    uploadRepository.finishTime = new Time(cHour,cMinute,cSecond);
-                    dataAll.addUploadRepository(uploadRepository);
+                    uploadSpreadsheetData.finishTime = new Time(cHourOfDay,cMinute,00);
+                    userData.addUploadRepository(uploadSpreadsheetData);
 
-                    applicationTimeTracker.setDataAll(dataAll);
+                    applicationTimeTracker.setUserData(userData);
                     startActivity(intentFinishActivity);                   
 
                     btn_open_close.setTextColor(Color.parseColor("#FFFFFF"));

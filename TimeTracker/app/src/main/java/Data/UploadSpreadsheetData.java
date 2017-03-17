@@ -10,16 +10,15 @@ import java.util.Calendar;
  * Created by Klemen on 13. 03. 2017.
  */
 
-public class UploadRepository {
+public class UploadSpreadsheetData {
     public Time startingTime;
     public Time finishTime;
     public Time workingTime;
     public Time overHoursTime;
-    public Time remoteTime;
     public String description;
     public Calendar date;
 
-    public UploadRepository(){
+    public UploadSpreadsheetData(){
     }
 
     public void setWorkingTime() throws ParseException {
@@ -28,10 +27,10 @@ public class UploadRepository {
         java.util.Date date2 = format.parse(finishTime.toString());
         long difference = date2.getTime() - date1.getTime();
         Time editedTime = new Time(difference);
-        workingTime = new Time(editedTime.getHours()-1,editedTime.getMinutes(),editedTime.getSeconds());
-
+        workingTime = new Time(editedTime.getHours()-1,editedTime.getMinutes(),0);
+        overHoursTime = new Time(0,0,0);
         if(workingTime.getHours()>8){
-            overHoursTime = new Time(workingTime.getHours()-8,workingTime.getMinutes(),workingTime.getSeconds());
+            overHoursTime = new Time(workingTime.getHours()-8,workingTime.getMinutes(),0);
             workingTime = new Time(8,0,0);
         }
 

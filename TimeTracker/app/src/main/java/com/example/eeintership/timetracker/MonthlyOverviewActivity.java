@@ -9,17 +9,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
-import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -35,11 +33,17 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
+import Data.DownloadSpreadsheetData;
+import Data.UserData;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
@@ -57,15 +61,23 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
     private String[] namesOfMonths;
     private int[] numberOfDaysInMonth;
 
+
+    private ApplicationTimeTracker applicationTimeTracker;
+    private UserData userData;
     ////
-    ListView l;
-    String[] cars = {"Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak", "Isak"};
+    ListView listView;
     ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monthlyoverview);
+
+
+        applicationTimeTracker = (ApplicationTimeTracker)getApplication();
+
+        userData = applicationTimeTracker.getUserData();
+
 
         // hide status bar
         View decorView = getWindow().getDecorView();
@@ -236,11 +248,11 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
         }
 
         //Function that gets the data from the sheet
-        private ArrayList<String>getDataFromSheet() throws IOException {
+        private ArrayList<String>getDataFromSheet() throws IOException, ParseException {
             //Test spreadsheet
             String spreadsheetId="1IeH8kq3znoWEA7-BG8iGBC3IQqUzfnxE_dsGliy1hyo";
-            String range = namesOfMonths[currentDate.get(Calendar.MONTH)]+"!A3:I"+
-                    String.valueOf(numberOfDaysInMonth[currentDate.get(Calendar.MONTH)]+2);
+            String range = namesOfMonths[currentDate.get(Calendar.MONTH)]+"!A3:H"+
+                    String.valueOf(currentDate.get(Calendar.DAY_OF_MONTH)+2);
             ArrayList<String> results = new ArrayList<String>();
             ValueRange response = this.mService.spreadsheets().values()
                     .get(spreadsheetId, range)
@@ -249,6 +261,25 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
             if (values != null) {
                 results.add("Datum");
                 for (List row : values) {
+
+                    DownloadSpreadsheetData downloadSpreadsheetData = new DownloadSpreadsheetData();
+                    String date = row.get(0).toString();
+                    int workingHours = Integer.parseInt(row.get(5).toString());
+                    int overHours = Integer.parseInt(row.get(6).toString());
+                    String description = row.get(7).toString();
+
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+                    Date dates = simpleDateFormat.parse(date);// all done
+
+                    Calendar cal = new GregorianCalendar();
+                    cal.setTime(dates);
+                    downloadSpreadsheetData.date = cal;
+                    downloadSpreadsheetData.description = description;
+                    downloadSpreadsheetData.workingHours = workingHours+overHours;
+                    userData.addDownloadRepository(downloadSpreadsheetData);
+
+
+
                     String temp = "";
                     for (int i = 0; i < row.size(); i++) {
                         temp += row.get(i) + " ";
@@ -256,6 +287,9 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
                     results.add(temp);
                 }
             }
+
+
+
             return results;
         }
 
@@ -270,8 +304,9 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
 //                textViewMonthlyOverview.setText("No results returned.");
             } else {
                 strings.add(0, "Data retrieved using the Google Sheets API:");
-                l = (ListView) findViewById(R.id.lista);
-                adapter = new ArrayAdapter<String>(getApplication(), android.R.layout.simple_list_item_1,strings) {
+                listView = (ListView) findViewById(R.id.lista);
+
+                adapter = new ArrayAdapter<String>(getApplication(), android.R.layout.simple_list_item_1,userData.DownloadSpreadsheetToString()) {
                     @NonNull
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
@@ -288,7 +323,7 @@ public class MonthlyOverviewActivity extends AppCompatActivity implements EasyPe
                         return v;
                     }
                 };
-                l.setAdapter(adapter);
+                listView.setAdapter(adapter);
             }
         }
 

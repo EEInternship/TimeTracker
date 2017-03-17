@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -20,8 +19,8 @@ import android.widget.EditText;
 import java.sql.Time;
 import java.text.ParseException;
 
-import Data.DataAll;
-import Data.UploadRepository;
+import Data.UserData;
+import Data.UploadSpreadsheetData;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -33,18 +32,18 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.client.util.Strings;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
 import pub.devrel.easypermissions.EasyPermissions;
-
-import static android.R.attr.max;
 
 public class FinishActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks{
 
@@ -61,17 +60,17 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
     private ApplicationTimeTracker applicationTimeTracker;
     private Button buttonFinish;
     private EditText editTextDescription;
-
+    private UserData userData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finish);
 
         applicationTimeTracker = (ApplicationTimeTracker) getApplication();
-        final DataAll dataAll = applicationTimeTracker.getDataAll();
-        final UploadRepository uploadRepository = dataAll.getUploadRepository();
+        userData = applicationTimeTracker.getUserData();
+        final UploadSpreadsheetData uploadSpreadsheetData = userData.getUploadSpreadsheetData();
         try {
-            uploadRepository.setWorkingTime();
+            uploadSpreadsheetData.setWorkingTime();
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -80,9 +79,9 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
         buttonFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadRepository.description = editTextDescription.getText().toString();
-                dataAll.addUploadRepository(uploadRepository);
-                applicationTimeTracker.setDataAll(dataAll);
+                uploadSpreadsheetData.description = editTextDescription.getText().toString();
+                userData.addUploadRepository(uploadSpreadsheetData);
+                applicationTimeTracker.setUserData(userData);
                 writeResultsToApi();
             }
         });
@@ -231,26 +230,29 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
 
         private void writeDataToSheet() throws IOException {
             String spreadsheetId = "1IeH8kq3znoWEA7-BG8iGBC3IQqUzfnxE_dsGliy1hyo";
-            String range = "Januar!B14:I14";
+           // String range = "Januar!B14:H14";
+
+            UploadSpreadsheetData uploadSpreadsheetData = userData.getUploadSpreadsheetData();
+
+            String range = namesOfMonth(uploadSpreadsheetData.date.get(Calendar.MONTH)+1)+"!B"+String.valueOf(uploadSpreadsheetData.date.get(Calendar.DAY_OF_MONTH)+2)+":H"+
+                    String.valueOf(uploadSpreadsheetData.date.get(Calendar.DAY_OF_MONTH)+2);
 
             //for the values that you want to input, create a list of object lists
             List<List<Object>> values = new ArrayList<>();
 
             //Where each value represents the list of objects that is to be written to a range
             //I simply want to edit a single row, so I use a single list of objects
-            List<Object> data1 = new ArrayList<>();
+            List<Object> spreadsheetData = new ArrayList<>();
             //Generate random int number for testing purposes
-            int randomNumber = random.nextInt(10 - 0 + 1);
-            data1.add("Rnd:" + randomNumber);
-            data1.add("prepisC");
-            data1.add("prepisD");
-            data1.add("prepisE");
-            data1.add("prepisF");
-            data1.add("prepisG");
-            data1.add("prepisH");
-            data1.add("prepisI");
+            spreadsheetData.add(cutTime(uploadSpreadsheetData.startingTime));
+            spreadsheetData.add( "/");
+            spreadsheetData.add( "/");
+            spreadsheetData.add(cutTime(uploadSpreadsheetData.finishTime));
+            spreadsheetData.add(cutTime(uploadSpreadsheetData.workingTime));
+            spreadsheetData.add(cutTime(uploadSpreadsheetData.overHoursTime));
+            spreadsheetData.add(uploadSpreadsheetData.description);
 
-            values.add(data1);
+            values.add(spreadsheetData);
 
             //Create the valuerange object and set its fields
             ValueRange valueRange = new ValueRange();
@@ -300,5 +302,64 @@ public class FinishActivity extends AppCompatActivity implements EasyPermissions
                 //mTextView.setText("Request cancelled.");
             }
         }
+    }
+
+
+    private String namesOfMonth(int monthNumber){
+        String month = "";
+        switch (monthNumber){
+            case 1:
+                month = "Januar";
+                break;
+            case 2:
+                month = "Februar";
+                break;
+            case 3:
+                month = "Marec";
+                break;
+            case 4:
+                month = "April";
+                break;
+            case 5:
+                month = "Maj";
+                break;
+            case 6:
+                month = "Junij";
+                break;
+            case 7:
+                month = "Julij";
+                break;
+            case 8:
+                month = "Avgust";
+                break;
+            case 9:
+                month = "September";
+                break;
+            case 10:
+                month = "Oktober";
+                break;
+            case 11:
+                month = "November";
+                break;
+            case 12:
+                month = "December";
+                break;
+        }
+        return month;
+    }
+
+    private String cutTime(Time time){
+        String hours, minutes;
+
+        if(time.getHours()<10)
+            hours = "0"+String.valueOf(time.getHours());
+        else
+            hours = String.valueOf(time.getHours());
+        if(time.getMinutes()<10)
+            minutes = "0"+String.valueOf(time.getMinutes());
+        else
+            minutes = String.valueOf(time.getMinutes());
+
+        return hours + ":" + minutes;
     }
 }
